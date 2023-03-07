@@ -432,6 +432,70 @@ async fn change_var(m: &mut Mpr, var: &str, val: &str) -> core::result::Result<b
 }
 
 async fn write_mpr(m: &Mpr,f: &str) -> core::result::Result<bool,Box<dyn std::error::Error +'static>>{
+    
+    let mut buffer = String::new();
+    for item in &m.preamble {
+        for c in item.chars(){
+            buffer.push(c);
+        }
+        for c in "\r\n".chars() {
+            buffer.push(c);
+        }
+    }
+    for c in "\r\n".chars() {
+        buffer.push(c);
+    }
+
+    for item in &m.vars {
+        for c in item.chars(){
+            buffer.push(c);
+        }
+        for c in "\r\n".chars() {
+            buffer.push(c);
+        }
+    }
+    for c in "\r\n".chars() {
+        buffer.push(c);
+    }
+    for item in &m.points {
+        for c in item.chars(){
+            buffer.push(c);
+        }
+        for c in "\r\n".chars() {
+            buffer.push(c);
+        }
+    }
+    for item in &m.board {
+        for c in item.chars(){
+            buffer.push(c);
+        }
+        for c in "\r\n".chars() {
+            buffer.push(c);
+        }
+    }
+    for c in "\r\n".chars() {
+        buffer.push(c);
+    }    
+    for item in &m.contours {
+        for c in item.chars(){
+            buffer.push(c);
+        }
+        for c in "\r\n".chars() {
+            buffer.push(c);
+        }
+    }
+    for item in &m.comments {
+        for c in item.chars(){
+            buffer.push(c);
+        }
+        for c in "\r\n".chars() {
+            buffer.push(c);
+        }
+    }
+    for c in "\r\n".chars() {
+        buffer.push(c);
+    }
+    tokio::fs::write(f,buffer.as_bytes()).await?;
 
 Ok(false)
 }
@@ -458,13 +522,17 @@ for (i,_) in args.iter().enumerate() {
     if args[i] == "--daemon" {
         spawn_daemon_b = true;
     } else if args[i] == "-e" || args[i] == "--edit" {
+        //Syntax: MprEdit <original file> -e/--edit var val
         let original_file = args[1].clone();
         let mut m = parse(original_file).await?; //parse file for mpr
         arg_var = args[i+1].clone();
         arg_val = args[i+2].clone();
         change_var(&mut m, arg_var.as_str(), arg_val.as_str()).await?;
         let new_file = "modified.mpr";
+        write_mpr(&m, new_file).await?;
 
+    } else if args[i] == "-h" || args[i] == "--help" {
+        print_help();
     }
 }
 
