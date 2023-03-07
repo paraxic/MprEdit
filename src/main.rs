@@ -378,6 +378,12 @@ async fn parse(f: String) -> core::result::Result<Mpr,Box<dyn std::error::Error 
 async fn change_var(m: &mut Mpr, var: &str, val: &str) -> core::result::Result<bool,Box<dyn std::error::Error + 'static>>{
     let mut ret = false;
     let mut replace_string = String::new();
+    let mut search_string = String::new();
+    for c in var.chars() {
+        search_string.push(c);
+    }
+    search_string.push('=');
+
     for c in var.chars(){
         replace_string.push(c);
     }
@@ -388,42 +394,42 @@ async fn change_var(m: &mut Mpr, var: &str, val: &str) -> core::result::Result<b
     }
     
             for line in &mut m.preamble {
-                if line.contains(var) {
+                if line.contains(&search_string) {
                    *line = replace_string.clone();
                 }
             }
      
       
             for line in &mut m.vars {
-                if line.contains(var) {
+                if line.contains(&search_string) {
                     *line = replace_string.clone();
                 }
             }
       
       
             for line in &mut m.board {
-                if line.contains(var) {
+                if line.contains(&search_string) {
                     *line = replace_string.clone();
                 }
             }
         
        
             for line in &mut m.points {
-                if line.contains(var) {
+                if line.contains(&search_string) {
                     *line = replace_string.clone();
                 }
             }
      
        
             for line in &mut m.contours {
-                if line.contains(var) {
+                if line.contains(&search_string) {
                     *line = replace_string.clone();
                 }
             }
       
        
             for line in &mut m.comments {
-                if line.contains(var) {
+                if line.contains(&search_string) {
                     *line = replace_string.clone();
                 }
             }
