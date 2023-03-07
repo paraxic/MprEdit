@@ -2,12 +2,15 @@
 
 //This program should just be running on the CNC checking each file preferably asynchronously should windows be capable of doing such
 use walkdir::WalkDir;
-use std::env::Vars;
+use std::env;
 use std::error::Error;
 use std::io;
 use std::io::Read;
 use std::io::Write;
+use std::ops::Index;
 use tokio::fs;
+
+const VERSION:&str ="0.1.0";
 
 //libmpr import
 pub struct Mpr{
@@ -306,15 +309,17 @@ async fn check_val(m: &Mpr, d: Data, var: &str, val: &str) -> core::result::Resu
     Ok(ret)
 }
 
+ 
 //this parse function is to take a file and a mutable reference to an MPR struct
 //fill in the struct and exit cleanly
 //base logic is "For line in file if line == start of Data::<type> fill in MPR::<type>"
 
-async fn parse(m: &mut Mpr ,f: String) -> core::result::Result<(),Box<dyn std::error::Error + 'static>>{
+async fn parse(f: String) -> core::result::Result<Mpr,Box<dyn std::error::Error + 'static>>{
     let contents = fs::read(f).await?;
     //let cdata = contents.into::<Vec<String>>();
     let cdata = String::from_utf8(contents).unwrap();
     //println!("{:?}",cdata);
+    let mut m = Mpr::new();
     let mut collect_preamble = false;
     let mut collect_vars = false;
     let mut collect_board = false;
@@ -368,13 +373,46 @@ async fn parse(m: &mut Mpr ,f: String) -> core::result::Result<(),Box<dyn std::e
         }
     }
     
-    Ok(())
+    Ok(m)
+}
+async fn change_var(m: &Mpr,var: &str, val: &str) -> core::result::Result<bool,Box<dyn std::error::Error + 'static>>{
+   
+   Ok(false)
+}
+
+fn print_help(){
+    println!("MprEdit {}",VERSION);
+    println!("\t--daemon\t\tspawn BoardWatch Daemon");
+    println!("\t-e/--edit [VAR] [NEWVAL]\t\tChange [VAR] to [NEWVAL]");
+    println!("\t-h/--help\t\tThis Help Message");
 }
 
 #[tokio::main]
 
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-const TO_MM:f64 = 25.4;
+const TO_MM:f64 = 25.4; //convert inches to milimeters
+let args: Vec<String> = env::args().collect();
+let mut spawn_daemon_b = false;
+let mut arg_var = String::new();
+let mut arg_val = String::new();
+
+let mut iter: usize = 0;
+
+for (i,_) in args.iter().enumerate() {
+    if args[i] == "--daemon" {
+        spawn_daemon_b = true;
+    } else if args[i] == "-e" || args[i] == "--edit" {
+        arg_var = args[i+1].clone();
+        arg_val = args[i+2].clone();
+
+    }
+}
+
+
+Ok(())
+}//end of main
+
+/* previous main loop
 //let mut mpr_data = Mpr::new();
 let mut files: Vec<String> = Vec::new();
 for entry in WalkDir::new(".") {
@@ -399,6 +437,4 @@ for f in WalkDir::new(".") {
  println!("Val: {}",thickness_val);
  
 }
-
-Ok(())
-}//end of main
+ */
