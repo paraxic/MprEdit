@@ -9,7 +9,6 @@ use std::io::Read;
 use std::io::Write;
 use std::ops::Index;
 use tokio::fs;
-
 const VERSION:&str ="0.1.0";
 
 //libmpr import
@@ -375,9 +374,66 @@ async fn parse(f: String) -> core::result::Result<Mpr,Box<dyn std::error::Error 
     
     Ok(m)
 }
-async fn change_var(m: &Mpr,var: &str, val: &str) -> core::result::Result<bool,Box<dyn std::error::Error + 'static>>{
-   
+//change vars should iterate over the MPR and modify var to be val <var="val">
+async fn change_var(m: &mut Mpr, var: &str, val: &str) -> core::result::Result<bool,Box<dyn std::error::Error + 'static>>{
+    let mut ret = false;
+    let mut replace_string = String::new();
+    for c in var.chars(){
+        replace_string.push(c);
+    }
+    replace_string.push('=');
+    replace_string.push('"');
+    for c in val.chars() {
+        replace_string.push(c);
+    }
+    
+            for line in &mut m.preamble {
+                if line.contains(var) {
+                   *line = replace_string.clone();
+                }
+            }
+     
+      
+            for line in &mut m.vars {
+                if line.contains(var) {
+                    *line = replace_string.clone();
+                }
+            }
+      
+      
+            for line in &mut m.board {
+                if line.contains(var) {
+                    *line = replace_string.clone();
+                }
+            }
+        
+       
+            for line in &mut m.points {
+                if line.contains(var) {
+                    *line = replace_string.clone();
+                }
+            }
+     
+       
+            for line in &mut m.contours {
+                if line.contains(var) {
+                    *line = replace_string.clone();
+                }
+            }
+      
+       
+            for line in &mut m.comments {
+                if line.contains(var) {
+                    *line = replace_string.clone();
+                }
+            }
+       
    Ok(false)
+}
+
+async fn write_mpr(m: &Mpr,f: &str) -> core::result::Result<bool,Box<dyn std::error::Error +'static>>{
+
+Ok(false)
 }
 
 fn print_help(){
@@ -402,8 +458,12 @@ for (i,_) in args.iter().enumerate() {
     if args[i] == "--daemon" {
         spawn_daemon_b = true;
     } else if args[i] == "-e" || args[i] == "--edit" {
+        let original_file = args[1].clone();
+        let mut m = parse(original_file).await?; //parse file for mpr
         arg_var = args[i+1].clone();
         arg_val = args[i+2].clone();
+        change_var(&mut m, arg_var.as_str(), arg_val.as_str()).await?;
+        let new_file = "modified.mpr";
 
     }
 }
