@@ -513,6 +513,20 @@ fn print_help(){
     println!("\t-h/--help\t\tThis Help Message");
 }
 
+async fn point_copy_to_offset(m: &mut Mpr, offset_val: String) ->core::result::Result<bool,Box<dyn std::error::Error + 'static>> {
+    let mut offset_str:String = "offset=\"".to_string();
+    for c in offset_val.chars(){
+        offset_str.push(c);
+    }
+    offset_str.push('"');
+
+    m.vars.push(offset_str);
+
+    
+
+    Ok(false)
+}
+
 #[tokio::main]
 
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
