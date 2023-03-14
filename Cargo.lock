@@ -6,6 +6,7 @@ version = 3
 name = "OneOff"
 version = "0.1.0"
 dependencies = [
+ "mpr",
  "tokio",
  "walkdir",
 ]
@@ -84,6 +85,13 @@ dependencies = [
  "log",
  "wasi",
  "windows-sys",
+]
+
+[[package]]
+name = "mpr"
+version = "0.1.0"
+dependencies = [
+ "tokio",
 ]
 
 [[package]]

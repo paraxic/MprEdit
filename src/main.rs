@@ -9,46 +9,11 @@ use std::io::Read;
 use std::io::Write;
 use std::ops::Index;
 use tokio::fs;
+use mpr::mpr::{Mpr,Data};
 const VERSION:&str ="0.1.0";
 
 //libmpr import
-pub struct Mpr{
-    pub preamble: Vec<String>,
-    pub vars: Vec<String>,
-    pub board: Vec<String>,
-    pub points: Vec<String>,
-    pub contours: Vec<String>,
-    pub comments: Vec<String>,
-}
 
-pub enum Data {
-preamble,
-vars,
-board,
-points,
-contours,
-comments,
-}
-
-impl Mpr {
-
-pub fn new() -> Mpr
-{
-    Mpr { 
-        preamble: Vec::<String>::new(),
-        vars:     Vec::<String>::new(),
-        board:    Vec::<String>::new(),
-        points:   Vec::<String>::new(),
-        contours: Vec::<String>::new(),
-        comments: Vec::<String>::new(),
-    }
-}
-pub fn dump(&self){
-    for v in &self.vars {
-        println!("{}",v);
-    }
-}
-}
 /*
 pub fn load(&mut self, filename: String)
 {
@@ -506,25 +471,18 @@ async fn write_mpr(m: &Mpr,f: &str) -> core::result::Result<bool,Box<dyn std::er
 Ok(false)
 }
 
+
+async fn point_copy_to_offset(m: &mut Mpr, offset_val: String) ->core::result::Result<bool,Box<dyn std::error::Error + 'static>> {
+  //TODO: Implement point_copy_to_offset
+
+    Ok(false)
+}
+
 fn print_help(){
     println!("MprEdit {}",VERSION);
     println!("\t--daemon\t\tspawn BoardWatch Daemon");
     println!("\t-e/--edit [VAR] [NEWVAL]\t\tChange [VAR] to [NEWVAL]");
     println!("\t-h/--help\t\tThis Help Message");
-}
-
-async fn point_copy_to_offset(m: &mut Mpr, offset_val: String) ->core::result::Result<bool,Box<dyn std::error::Error + 'static>> {
-    let mut offset_str:String = "offset=\"".to_string();
-    for c in offset_val.chars(){
-        offset_str.push(c);
-    }
-    offset_str.push('"');
-
-    m.vars.push(offset_str);
-
-    
-
-    Ok(false)
 }
 
 #[tokio::main]
